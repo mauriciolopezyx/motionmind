@@ -14,6 +14,8 @@ public class GameService {
     private final RestTemplate restTemplate;
     private final SimpMessagingTemplate messagingTemplate;
 
+    private volatile WireframeResponse lastPrediction;
+
     public GameService(
             RestTemplateBuilder builder,
             SimpMessagingTemplate simpMessagingTemplate
@@ -35,13 +37,17 @@ public class GameService {
             );
             assert result != null;
 
-            //WireframeResponse result = new WireframeResponse("PLACEHOLDER", 100.0, null);
+            this.lastPrediction = result;
 
             messagingTemplate.convertAndSendToUser(username, "/topic/lesson/1", result);
 
         } catch (Exception e) {
             System.out.println("Error calling Flask: " + e.getMessage());
         }
+    }
+
+    public WireframeResponse getLastPrediction() {
+        return lastPrediction;
     }
 
 }

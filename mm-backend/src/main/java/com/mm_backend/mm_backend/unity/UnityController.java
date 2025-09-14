@@ -2,6 +2,7 @@ package com.mm_backend.mm_backend.unity;
 
 import com.mm_backend.mm_backend.game.GameService;
 import com.mm_backend.mm_backend.game.dto.VideoFrameDto;
+import com.mm_backend.mm_backend.game.dto.WireframeResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -16,10 +17,20 @@ import java.security.Principal;
 @RequestMapping("/unity")
 public class UnityController {
 
-    @GetMapping("/ok")
-    public ResponseEntity<?> checkOkay() {
-        System.out.println("Received ok request?");
-        return ResponseEntity.status(HttpStatus.OK).build();
+    private final GameService gameService;
+
+    public UnityController(GameService gameService) {
+        this.gameService = gameService;
     }
 
+    @GetMapping("/latest")
+    public ResponseEntity<?> getLatestPrediction() {
+        WireframeResponse last = gameService.getLastPrediction();
+        System.out.println("received unity 1");
+        if (last == null) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        }
+        System.out.println("received unity 2");
+        return ResponseEntity.ok(last);
+    }
 }
